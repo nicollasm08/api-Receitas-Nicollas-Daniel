@@ -173,4 +173,5 @@ def hello():
 
 @app.get("/receitas/{receitas}")
 def get_receita():
+    return receitas
    
