@@ -171,7 +171,8 @@ receitas = [
 def hello():
     return{"titulo":"Livro de Receitas"}
 
-@app.get("/receitas/{receitas}")
-def get_receita():
-    return receitas
+@app.get("/receitas/{receita}")
+def get_receita({receita: str}):
+    for receita in receitas:
+        print(x)
    
