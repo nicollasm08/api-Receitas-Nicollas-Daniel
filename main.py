@@ -173,6 +173,7 @@ def hello():
 
 @app.get("/receitas/{receita}")
 def get_receita(receita: str):
-    for receita in receitas:
-        print()
-   
+    for r in receitas:
+        if r["nome"].lower() == receita.lower():
+            return r
+    return {"erro": "Receita não encontrada"}
