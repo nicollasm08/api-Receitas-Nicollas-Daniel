@@ -1,8 +1,19 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
 
 app = FastAPI(title = "API dos negros")
 
-receitas = [
+class Receita(BaseModel):
+    nome: str
+    ingredientes: List[str]
+    modo_de_preparo: str
+
+receitas: List[Receita] = []
+
+
+
+'''receitas = [
     {
         'nome': 'Abacatada',
     
@@ -165,7 +176,7 @@ receitas = [
                        '5. Leve ao forno médio preaquecido por 45 minutos, em banho-maria (forma de pudim dentro de uma forma maior com água).\n'
                        '6. Espete um garfo para verificar se está assado. Retire do forno, deixe esfriar e desenforme em um prato de sobremesa.'
     },
-]
+]'''
 
 @app.get("/")
 def hello():
@@ -177,3 +188,15 @@ def get_receita(receita: str):
         if r["nome"].lower() == receita.lower():
             return r
     return {"erro": "Receita não encontrada"}
+
+@app.get("receitas")
+def get_todas_receits():
+    return receitas
+
+@app.post("/receitas", response_model=Receita, status_code=status=201) 
+def criar_receita(dados: Receita):
+
+    nova_receitas = dados
+    receitas.append(nova_receita)
+
+    return nova_receita
