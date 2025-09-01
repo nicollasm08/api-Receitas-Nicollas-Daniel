@@ -193,10 +193,10 @@ def get_receita(receita: str):
 def get_todas_receits():
     return receitas
 
-@app.post("/receitas", response_model=Receita, status_code=status=201) 
+@app.post("/receitas", response_model=Receita, status_code=201) 
 def criar_receita(dados: Receita):
 
     nova_receitas = dados
-    receitas.append(nova_receita)
+    receitas.append(nova_receitas)
 
-    return nova_receita
+    return nova_receitas
