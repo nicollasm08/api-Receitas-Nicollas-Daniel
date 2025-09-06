@@ -49,4 +49,8 @@ def criar_receita(dados: Receita):
 
     receitas.append(nova_receita)
 
-    return nova_receitas
+@app.get("/receitas/id/{id}")
+def get_receitas_por_id(id: str):
+    for r in receitas:
+        if r.id == id:
+            return r
