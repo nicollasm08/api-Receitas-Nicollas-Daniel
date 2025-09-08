@@ -20,6 +20,13 @@ def hello():
 def get_todas_receitas():
     return receitas
 
+@app.get("/receitas/{nome}")
+def get_receita(nome: str):
+    for r in receitas:
+        if r.nome.lower() == nome.lower():
+            return r
+    raise HTTPException(status_code=404, detail="Receita não encontrada")
+
 @app.get("/receitas/{id}")
 def get_receita(id: int):
     for r in receitas:
@@ -27,10 +34,4 @@ def get_receita(id: int):
             return r
     raise HTTPException(status_code=404, detail="Receita não encontrada")
 
-@app.post("/receitas", response_model=Receita, status_code=201)
-def criar_receita(dados: Receita):
-    for r in receitas:
-        if r.nome.lower() == dados.nome.lower():
-            raise HTTPException(status_code=400, detail="Já existe uma receita com esse nome.")
-    receitas.append(dados)
-    return dados
+
