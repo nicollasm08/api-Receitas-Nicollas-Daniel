@@ -10,7 +10,6 @@ class Receita(BaseModel):
     ingredientes: List[str]
     modo_de_preparo: str
 
-# Modelo para criação de receita (POST)
 class Create_Receita(BaseModel):
     nome: str
     ingredientes: List[str]  # lista normal
