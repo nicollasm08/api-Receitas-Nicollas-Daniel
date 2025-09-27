@@ -24,6 +24,8 @@ def hello():
 
 @app.get("/receitas")
 def get_todas_receitas():
+    if len(receitas) == 0:
+        return {"mensagem": "Não há receitas criadas"}
     return receitas
 
 @app.get("/receitas/{nome_receita}")
