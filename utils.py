@@ -129,6 +129,9 @@ def update_usuario(id: int, dados: schema.BaseUsuario):
     for i in main.usuarios:
         if i.email == dados.email:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Este email já existe")
+        
+        if not(re.search(r'[A-Za-z]', dados.senha)) and not(re.search(r'\d', dados.senha)):
+            raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail= "A senha deve conter números e letras")
 
     usuario_atualizado = main.Usuario(
         id = id,
