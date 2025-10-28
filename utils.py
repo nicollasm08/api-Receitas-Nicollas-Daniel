@@ -94,9 +94,12 @@ def create_usuario(dados: schema.BaseUsuario):
     for usuario in main.usuarios:
         if usuario.email == dados.email:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Este email já existe")
+    
+    if not(re.search(r'[A-Za-z]', dados.senha)) and not(re.search(r'\d', dados.senha)):
+        raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail= "A senha deve conter números e letras")
         
     id_user += 1
-    novo_user = Receita(
+    novo_user = main.Usuario(
         id = id_user,
         nome_usuario = dados.nome_usuario,
         email = dados.email,
