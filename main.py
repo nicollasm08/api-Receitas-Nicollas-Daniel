@@ -47,7 +47,7 @@ def deletar_receita(id: int):
 def create_usuario(dados: schema.BaseUsuario):
     global id_user
     id_user += 1
-    return utils.create_usuario(dados)
+    return utils.create_usuario(usuarios, id_user, dados)
 
 @app.get("/Usuarios", status_code=utils.HTTPStatus.OK, response_model=schema.List[schema.UsuarioPublic])
 def get_todos_usuarios():

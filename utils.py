@@ -1,9 +1,10 @@
 from http import HTTPStatus
 from fastapi import FastAPI, HTTPException
-from schema import Create_Receita, Receita
+from schema import Create_Receita, Receita, Usuario
 import re
 import main
 import schema
+
 
 # Funções do Back-End
 
@@ -27,7 +28,7 @@ def get_receita(receitas, id: int):
             return receita
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Receita não encontrada")
 
-def create_receita(receitas, id_receita, dados: Create_Receita):
+def create_receita(receitas, id_receita,  dados: Create_Receita):
     for receita in receitas:
         if receita.nome.lower() == dados.nome.lower():
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Receita já existe")
@@ -90,7 +91,7 @@ def deletar_receita(receitas, id: int):
 
 # Funções de Usuário
 
-def create_usuario(dados: schema.BaseUsuario):
+def create_usuario(usuarios, id_user: int, dados: schema.BaseUsuario):
     for usuario in main.usuarios:
         if usuario.email == dados.email:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Este email já existe")
@@ -98,12 +99,11 @@ def create_usuario(dados: schema.BaseUsuario):
     if not(re.search(r'[A-Za-z]', dados.senha)) and not(re.search(r'\d', dados.senha)):
         raise HTTPException(status_code=HTTPStatus.BAD_REQUEST, detail= "A senha deve conter números e letras")
         
-    id_user += 1
-    novo_user = main.Usuario(
+    novo_user = schema.Usuario(
         id = id_user,
         nome_usuario = dados.nome_usuario,
         email = dados.email,
-        senha = dados.modo_de_preparosenha
+        senha = dados.modo_de_preparo
     )
     main.usuarios.append(novo_user)
     return novo_user
