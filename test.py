@@ -1,0 +1,24 @@
+from fastapi import FastAPI
+
+from sqlalchemy import create_engine
+from slqalchemy.orm import Session
+
+from models import User, table_registry
+
+app = utils.FastAPI(title="Livro de Receitas")
+
+engine = create_engine("sqlite:///:memory:", echo=False)
+
+table_registry.metadata.create_all(engine)
+
+with Session(engine) as session:
+    maneu = User(
+        username = "maneu", password = "maneu.xp", email = "maneudapop100@gmail.com"
+    )
+    session.add(maneu)
+    session.commit()
+    session.refresh(maneu)
+
+print(f"DADOS DO USUÁRIO: {maneu}")
+print(f"ID: {maneu.id}")
+print(f"Criado em: {maneu.created_at}")
