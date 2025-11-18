@@ -13,7 +13,7 @@ table_registry.metadata.create_all(engine)
 
 with Session(engine) as session:
     maneu = User(
-        username = "maneu", password = "maneu.xp", email = "maneudapop100@gmail.com"
+        nome_usuario = "maneu", senha = "maneu.xp", email = "maneudapop100@gmail.com"
     )
     session.add(maneu)
     session.commit()
