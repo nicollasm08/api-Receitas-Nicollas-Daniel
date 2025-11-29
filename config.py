@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     app_name: str = "Livro de Receitas"
-    debug: bool = true
+    debug: bool = True
     database_url: str
 
     class Config:

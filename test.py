@@ -1,11 +1,9 @@
 from fastapi import FastAPI
-
 from sqlalchemy import create_engine
-from slqalchemy.orm import Session
-
+from sqlalchemy.orm import Session
 from models import User, table_registry
 
-app = utils.FastAPI(title="Livro de Receitas")
+app = FastAPI(title="Livro de Receitas")
 
 engine = create_engine("sqlite:///:memory:", echo=False)
 
@@ -13,7 +11,9 @@ table_registry.metadata.create_all(engine)
 
 with Session(engine) as session:
     maneu = User(
-        nome_usuario = "maneu", senha = "maneu.xp", email = "maneudapop100@gmail.com"
+        nome_usuario="maneu", 
+        senha="maneu.xp", 
+        email="maneudapop100@gmail.com"
     )
     session.add(maneu)
     session.commit()
