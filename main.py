@@ -1,5 +1,9 @@
 import schema 
 import utils
+from models import User
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from database import get_session
 
 app = utils.FastAPI(title="Livro de Receitas")
 

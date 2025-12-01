@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from schema import Create_Receita, Receita, Usuario
 import re
 import main
@@ -91,8 +91,25 @@ def deletar_receita(receitas, id: int):
 
 # Funções de Usuário
 
-def create_usuario(usuarios, id_user: int, dados: schema.BaseUsuario):
-    for usuario in main.usuarios:
+def create_usuario(dados: schema.BaseUsuario, session: Session = Depends(get_session)):
+    db_user = session.scalar(select(User).where((User.nome_usuario == dados.nome_usuario) | (User.email == dados.email)))
+
+    if db_user:
+        if db_user.nome_usuario == dados.nome_usuario:
+            raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Nome de usuário já existe",)
+        elif db_user.email == dados.email:
+            raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Email já existe",)
+
+    db_user = User(
+        nome_ususario=dados.nome_usuario, senha=dados.senha, email=dados.email
+    )
+    session.add(db_user)
+    session.commit()
+    sesion.refresh(db_user)
+
+    return db_user
+
+    '''for usuario in main.usuarios:
         if usuario.email == dados.email:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Este email já existe")
     
@@ -106,24 +123,44 @@ def create_usuario(usuarios, id_user: int, dados: schema.BaseUsuario):
         senha = dados.senha
     )
     main.usuarios.append(novo_user)
-    return novo_user
+    return novo_user'''
 
-def get_todos_usuarios():
-    if len(main.usuarios) == 0:
+def get_todos_usuarios(skip: int = 0, limit: int = 100, session: Session - Depends(get_session)):
+    users = session.scalars(select(User).offset(skip).limit(limit)).all()
+
+    return users
+
+    '''if len(main.usuarios) == 0:
         return {"mensagem": "Não há usuários cadastrados"}
-    return main.usuarios
+    return main.usuarios'''
 
-def get_usuarios_por_nome(nome_usuario:str):
-    for usuario in main.usuarios:
+def get_usuarios_por_nome(nome_usuario: str, sessio: Session = Depends(get_session)):
+    db_user = session.scalar(
+        select(User).where((User.nome_usuario == nome_usuario))
+    )
+    if db_user:
+        return db_user
+
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")
+
+    '''for usuario in main.usuarios:
         if usuario.nome_usuario == nome_usuario:
             return usuario
-    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")'''
 
-def get_usuarios_por_id(id:int):
-    for usuario in main.usuarios:
+def get_usuarios_por_id(id: int, session: session = Depends(get_session)):
+    db_user = session.scalar(
+        select(User).where((User.id == id))
+    )
+    if db_user:
+        return db_user
+    
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")
+        
+    '''for usuario in main.usuarios:
         if usuario.id == id:
             return usuario
-    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")'''
 
 def update_usuario(id: int, dados: schema.BaseUsuario):
     for i in main.usuarios:
