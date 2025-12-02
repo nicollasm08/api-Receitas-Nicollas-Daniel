@@ -1,9 +1,14 @@
 from http import HTTPStatus
 from fastapi import FastAPI, HTTPException, Depends
 from schema import Create_Receita, Receita, Usuario
+from models import User
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+from database import get_session
 import re
 import main
 import schema
+from sqlalchemy.exc import IntegrityError
 
 
 # Funções do Back-End
@@ -125,7 +130,7 @@ def create_usuario(dados: schema.BaseUsuario, session: Session = Depends(get_ses
     main.usuarios.append(novo_user)
     return novo_user'''
 
-def get_todos_usuarios(skip: int = 0, limit: int = 100, session: Session - Depends(get_session)):
+def get_todos_usuarios(skip: int = 0, limit: int = 100, session: Session = Depends(get_session)):
     users = session.scalars(select(User).offset(skip).limit(limit)).all()
 
     return users
@@ -148,7 +153,7 @@ def get_usuarios_por_nome(nome_usuario: str, sessio: Session = Depends(get_sessi
             return usuario
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")'''
 
-def get_usuarios_por_id(id: int, session: session = Depends(get_session)):
+def get_usuarios_por_id(id: int, session: Session = Depends(get_session)):
     db_user = session.scalar(
         select(User).where((User.id == id))
     )
@@ -162,8 +167,25 @@ def get_usuarios_por_id(id: int, session: session = Depends(get_session)):
             return usuario
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")'''
 
-def update_usuario(id: int, dados: schema.BaseUsuario):
-    for i in main.usuarios:
+def update_usuario(id: int, dados: schema.BaseUsuario, session: Session = Depends(get_session)):
+
+    db_user = session.scalar(select(User).where(User.id == id))
+    if not db_user:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")
+    
+    try:
+        db_user.nome_usuario = dados.nome_usuario
+        db_user.senha = dados.senha
+        db_user.email = dados.email
+        session.commit()
+        sesion.refresh(db_user)
+
+        return db_user
+
+    except IntegrityError:
+        raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Nome de usuário ou Email já existe")
+
+    '''for i in main.usuarios:
         if i.email == dados.email:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail="Este email já existe")
         
@@ -177,10 +199,21 @@ def update_usuario(id: int, dados: schema.BaseUsuario):
         senha = dados.senha
         )
     main.usuarios[i] = usuario_atualizado
-    return usuario_atualizado
+    return usuario_atualizado'''
 
-def delete_usuario(id: int):
-    if len(main.usuarios) == 0:
+def delete_usuario(id: int, session: Session = Depends(get_session)):
+    db_user = session.scalar(select(User).where(User.id == id))
+
+    if not db_user:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")
+    
+
+    session.delete(db_user)
+    session.commit()
+
+    return db_user
+
+    '''if len(main.usuarios) == 0:
          raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="A lista está vazia, não há usuários cadastrados")
          
     for i in range(len(main.usuarios)):
@@ -188,4 +221,4 @@ def delete_usuario(id: int):
             usuario_removido = main.usuarios.pop(i)
             return {"mensagem": f"O usuário {usuario_removido.nome} foi deletado"}
         
-    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")
+    raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")'''
