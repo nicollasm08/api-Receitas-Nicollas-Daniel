@@ -135,7 +135,7 @@ def get_todos_usuarios(session: Session, skip: int = 0, limit: int = 100):
         return {"mensagem": "Não há usuários cadastrados"}
     return main.usuarios'''
 
-def get_usuarios_por_nome(nome_usuario: str, session: Session = Depends(get_session)):
+def get_usuarios_por_nome(nome_usuario: str, session: Session): # REMOVIDO: = Depends(get_session)
     db_user = session.scalar(
         select(User).where((User.nome_usuario == nome_usuario))
     )
@@ -149,7 +149,7 @@ def get_usuarios_por_nome(nome_usuario: str, session: Session = Depends(get_sess
             return usuario
     raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Usuário não encontrado")'''
 
-def get_usuarios_por_id(id: int, session: Session = Depends(get_session)):
+def get_usuarios_por_id(id: int, session: Session):
     db_user = session.scalar(
         select(User).where((User.id == id))
     )
